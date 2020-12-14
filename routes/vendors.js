@@ -1,8 +1,13 @@
 const express = require('express');
 const Vendor = require('../models/vendors_model');
+const {validate} = require('../models/vendors_model');
 const router = express.Router('mongoose');
 
 router.post('/', async(req, res) => {
+
+    const { error } = validate(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
     const vendor = new Vendor({
         name: req.body.name,
         contact: req.body.contact,
@@ -34,7 +39,7 @@ router.get('/:id', async(req, res) => {
         const vendor = await Vendor.findById(req.params.id)
         res.json(vendor);
     }catch(err){
-        res.send('Error: ' + err);
+        res.status(404).send('The Vendor with the given ID was not found. ' + err);
     }
 })
 
@@ -47,11 +52,14 @@ router.patch('/:id', async(req, res) => {
         vendor.email = req.body.email
         vendor.alternativeNo = req.body.alternativeNo
         vendor.appExpress = req.body.appExpress
+
+        const { error } = validate(req.body);
+        if (error) return res.status(400).send(error.details[0].message);
         
         const b1 = await vendor.save()
         res.json(b1);
     }catch(err){
-        res.send('Error: ' + err);
+        res.status(404).send('The Vendor with the given ID was not found. ' + err);
     }
 })
 
@@ -62,10 +70,10 @@ router.delete('/:id', async(req, res) => {
         res.status(200).json({
             message: "Request Vendor was DELETED",
             id: req.params.id,
-            vendor
+            name: vendor.name
         })
     }catch(err){
-        res.send('Error: ' + err);
+        res.status(404).send('The Vendor with the given ID was not found. ' + err);
     }
 });
 

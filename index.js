@@ -1,3 +1,5 @@
+const Joi = require('@hapi/joi');
+Joi.objectId = require('joi-objectid')(Joi);
 const express = require('express');
 const mongoose = require('mongoose');
 const clientRouter = require('./routes/clients');

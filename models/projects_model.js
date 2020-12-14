@@ -1,3 +1,4 @@
+const Joi = require('@hapi/joi');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -31,5 +32,20 @@ const projectSchema = new Schema({
     }
 });
 
-const projects = mongoose.model('Project', projectSchema);
-module.exports = projects;
+function validateProject(project) {
+    const schema = {
+        name: Joi.string().min(5).max(52).required(),
+        client: Joi.objectId().required(),
+        vendor: Joi.objectId().required(),
+        actualCost: Joi.string(),
+        vendorCost: Joi.string(),
+        advance: Joi.string(),
+        months: Joi.string(),
+        deadline: Joi.string()
+    };
+  
+    return Joi.validate(project, schema);
+}
+const Project = mongoose.model('Project', projectSchema);
+module.exports = Project;
+module.exports.validate = validateProject;
