@@ -1,9 +1,11 @@
+const admin = require('../middleware/admin');
+const auth = require('../middleware/auth');
 const express = require('express');
 const Client = require('../models/clients_model');
 const {validate} = require('../models/clients_model');
 const router = express.Router('mongoose');
 
-router.post('/', async(req, res) => {
+router.post('/', auth, async(req, res) => {
 
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -23,7 +25,7 @@ router.post('/', async(req, res) => {
     }
 });
 
-router.get('/', async(req, res) => {
+router.get('/', auth, async(req, res) => {
     try{
         const clients = await Client.find()
         res.json(clients);
@@ -32,7 +34,7 @@ router.get('/', async(req, res) => {
     }
 })
 
-router.get('/:id', async(req, res) => {
+router.get('/:id', auth, async(req, res) => {
     try{
         const client = await Client.findById(req.params.id)
         res.json(client);
@@ -41,7 +43,7 @@ router.get('/:id', async(req, res) => {
     }
 })
 
-router.patch('/:id', async(req, res) => {
+router.patch('/:id', auth, async(req, res) => {
     try{
         const client = await Client.findById(req.params.id)
         client.name = req.body.name
@@ -59,7 +61,7 @@ router.patch('/:id', async(req, res) => {
     }
 })
 
-router.delete('/:id', async(req, res) => {
+router.delete('/:id', [auth, admin], async(req, res) => {
     try{
         const client = await Client.findById(req.params.id)
         const a1 = await client.remove()

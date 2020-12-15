@@ -1,3 +1,5 @@
+const admin = require('../middleware/admin');
+const auth = require('../middleware/auth');
 const express = require('express');
 const Project = require('../models/projects_model');
 const {validate} = require('../models/projects_model');
@@ -5,7 +7,7 @@ const Client = require('../models/clients_model');
 const Vendor = require("../models/vendors_model");
 const router = express.Router('mongoose');
 
-router.post('/', async (req, res) => {
+router.post('/', [auth, admin], async (req, res) => {
 
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
@@ -35,7 +37,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/', async(req, res) => {
+router.get('/', [auth, admin], async(req, res) => {
     try{
         const projects = await Project.find()
         res.json(projects);
@@ -44,7 +46,7 @@ router.get('/', async(req, res) => {
     }
 })
 
-router.get('/:id', async(req, res) => {
+router.get('/:id', [auth, admin], async(req, res) => {
     try{
         const project = await Project.findById(req.params.id);
         res.json(project);
@@ -53,7 +55,7 @@ router.get('/:id', async(req, res) => {
     }
 })
 
-router.patch('/:id', async(req, res) => {
+router.patch('/:id', [auth, admin], async(req, res) => {
     try{
         const project = await Project.findById(req.params.id)
         project.name = req.body.name
@@ -75,7 +77,7 @@ router.patch('/:id', async(req, res) => {
     }
 })
 
-router.delete('/:id', async(req, res) => {
+router.delete('/:id', [auth, admin], async(req, res) => {
     try{
         const project = await Project.findById(req.params.id)
         const c1 = await project.remove()
